@@ -1,4 +1,4 @@
- ###DiabetesInsight-RAG 🩺
+ ### DiabetesInsight-RAG 🩺
 
 A Retrieval-Augmented Generation (RAG) system for querying medical information about Type 2 Diabetes, built with LangChain, FAISS, and Ollama.
 
