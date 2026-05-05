@@ -11,7 +11,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 load_dotenv()
 
 DATA_PATH = Path(__file__).parent.parent / "data" / "raw"
-VECTORSTORE_PATH = Path("C:/vectorstore_diabetes")
+VECTORSTORE_PATH = Path(__file__).parent.parent / "vectorstore"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
@@ -54,13 +54,16 @@ def split_documents(documents):
 def create_vectorstore(chunks):
     print("Creating embeddings...")
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     )
     print("Creating vector store...")
     vectorstore = FAISS.from_documents(chunks, embeddings)
     VECTORSTORE_PATH.mkdir(parents=True, exist_ok=True)
-    vectorstore.save_local(VECTORSTORE_PATH)
-    print(f"Vector store saved to {VECTORSTORE_PATH}")
+    
+    # Resolvemos a string la ruta absoluta (importante para FAISS en Windows/OneDrive)
+    save_path = str(VECTORSTORE_PATH.resolve())
+    vectorstore.save_local(save_path)
+    print(f"Vector store saved to {save_path}")
     return vectorstore
 
 

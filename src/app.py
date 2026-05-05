@@ -2,6 +2,7 @@
 Streamlit app for Diabetes Type 2 RAG system.
 """
 import os
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 import streamlit as st
@@ -10,27 +11,29 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_ollama import OllamaLLM
+from langchain_groq import ChatGroq
 load_dotenv()
 
-VECTORSTORE_PATH = Path("C:/vectorstore_diabetes")
+VECTORSTORE_PATH = Path(__file__).parent.parent / "vectorstore"
+
+def clean_question(q: str) -> str:
+    """Normaliza y limpia la pregunta del usuario."""
+    q = re.sub(r'\s+', ' ', q).strip()
+    return q
 
 
 MEDICAL_PROMPT = PromptTemplate(
     template="""Eres un asistente médico especializado en diabetes tipo 2.
-Usa los siguientes fragmentos de documentos médicos para responder la pregunta.
 
-Contexto:
+Contexto médico proporcionado:
 {context}
 
 Instrucciones:
-- Responde usando la información del contexto anterior.
-- Si el contexto contiene información relevante, úsala para dar una respuesta clara.
-- Si la pregunta es sobre un tema completamente diferente a la diabetes, responde: "Esta pregunta está fuera del alcance de este sistema. Te recomiendo consultar a un médico."
-- No inventes datos que no estén en el contexto.
+- Prioriza SIEMPRE la información del contexto para recomendaciones específicas.
+- Si el contexto no contiene una definición básica (como qué es la enfermedad), puedes usar tu conocimiento general para dar una respuesta introductoria breve, pero siempre aclara qué partes vienen de los documentos oficiales.
+- Mantén un tono profesional y basado en evidencia.
 
 Pregunta: {question}
-
 Respuesta:""",
     input_variables=["context", "question"]
 )
@@ -39,11 +42,13 @@ Respuesta:""",
 @st.cache_resource
 def load_vectorstore():
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         encode_kwargs={"normalize_embeddings": True}
     )
+    # Resolvemos la ruta a absoluta para evitar problemas con FAISS en Windows
+    load_path = str(VECTORSTORE_PATH.resolve())
     return FAISS.load_local(
-        str(VECTORSTORE_PATH),
+        load_path,
         embeddings,
         allow_dangerous_deserialization=True
     )
@@ -53,9 +58,10 @@ def load_chain():
     vectorstore = load_vectorstore()
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
-    llm = OllamaLLM(
-        model="llama3.2",
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
         temperature=0.3,
+        api_key=os.getenv("GROQ_API_KEY")
     )
 
     def format_docs(docs):
@@ -94,6 +100,7 @@ def main():
     question = st.chat_input("Escribe tu pregunta sobre diabetes tipo 2...")
 
     if question:
+        question = clean_question(question)
         with st.chat_message("user"):
             st.write(question)
 
