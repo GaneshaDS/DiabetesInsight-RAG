@@ -1,0 +1,20 @@
+[theme]
+# ── Paleta Tech-Minimalist / Dark Academia ──────────────────────────────────
+# Fondo principal: carbón profundo (no negro puro → menos fatiga visual)
+backgroundColor      = "#121212"
+
+# Fondo secundario: sidebar y contenedores internos
+secondaryBackgroundColor = "#1C1C1E"
+
+# Texto principal: gris muy claro (no blanco puro → más elegante)
+textColor            = "#E0E0E0"
+
+# Acento: azul medianoche / cobalto apagado
+primaryColor         = "#4A90D9"
+
+# Tipografía limpia sans-serif
+font                 = "sans serif"
+
+[server]
+# Desactiva el aviso de depreciación en consola
+headless            = true
