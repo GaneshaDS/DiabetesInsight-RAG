@@ -4,6 +4,13 @@ A professional **Retrieval-Augmented Generation (RAG)** system designed for quer
 
 ---
 
+## 🌐 Live Demo
+
+🚀 Try the app here:  
+👉 https://diabetesinsight-rag-jnv7zjh9qqtgmfat6nr7ke.streamlit.app/
+
+---
+
 ## 🎯 Overview
 
 **DiabetesInsight-RAG** is an AI-powered medical assistant that answers questions based exclusively on official medical documents.
