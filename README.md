@@ -205,4 +205,4 @@ Instituto Tecnológico de Morelia
 
 ## 📜 License
 
-MIT License
+The source code is released under the [MIT License](LICENSE). The documents in `data/raw/` are **not** covered by this license: they remain the property of their respective authors and publishers (WHO, ADA, IMSS, NHS, etc.) and are included only as reference material for the retrieval index.
