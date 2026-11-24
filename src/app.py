@@ -10,12 +10,12 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 import streamlit as st
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 from styles import CUSTOM_CSS
+from ingest import get_embeddings
 
 load_dotenv()
 
@@ -117,10 +117,7 @@ Respuesta:""",
 
 @st.cache_resource
 def load_vectorstore():
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-        encode_kwargs={"normalize_embeddings": True}
-    )
+    embeddings = get_embeddings()
     load_path = str(VECTORSTORE_PATH.resolve())
     return FAISS.load_local(
         load_path,

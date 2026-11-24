@@ -14,6 +14,21 @@ DATA_PATH = Path(__file__).parent.parent / "data" / "raw"
 VECTORSTORE_PATH = Path(__file__).parent.parent / "vectorstore"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
+EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+
+def get_embeddings():
+    """Embeddings compartidos por la ingesta y la app.
+
+    Indexar y consultar DEBEN usar exactamente la misma configuración: si el
+    índice se construye con vectores sin normalizar y las consultas se
+    normalizan (o al revés), las distancias L2 de FAISS dejan de ser
+    comparables y la recuperación empeora.
+    """
+    return HuggingFaceEmbeddings(
+        model_name=EMBEDDING_MODEL,
+        encode_kwargs={"normalize_embeddings": True},
+    )
 
 
 def load_documents():
@@ -53,9 +68,7 @@ def split_documents(documents):
 
 def create_vectorstore(chunks):
     print("Creating embeddings...")
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    )
+    embeddings = get_embeddings()
     print("Creating vector store...")
     vectorstore = FAISS.from_documents(chunks, embeddings)
     VECTORSTORE_PATH.mkdir(parents=True, exist_ok=True)
